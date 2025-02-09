@@ -54,9 +54,6 @@ INSERT INTO students (student_code, full_name) VALUES
 INSERT INTO project_students (project_id, student_id) VALUES
 (1, 1), (1, 2), (2, 2), (2, 3);
 
-INSERT INTO project_images (project_id, image_url) VALUES
-(1, 'anh1.jpg'),
-(1, 'anh2.jpg');
 
 
 
