@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
+
+    <main>
+      <form action="/user/add" method="post" id="userForm">
+        <label for="name">name</label>
+        <input id="name" type="text" name="name" />
+        <label for="password">password</label>
+        <input id="password" type="text" name="password">
+        <label for="role">role</label>
+        <select name="role" id="role">
+            <option value="admin">admin</option>
+            <option value="teacher">teacher</option>
+        </select>
+
+        <input id="" type="submit" value="Submit">
+        <input id="" type="reset" value="Reset">
+        </form>
+    </main>
+
+    <footer><%- include('../partials/footer'); %></footer>
+    <script>
+    window.addEventListener("load", function () {
+    document.querySelector("#userForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    let name = document.querySelector("#name").value;
+    let password = document.querySelector("#password").value;
+    let role = document.querySelector("#role").value;
+
+    let data = JSON.stringify({ name, password, role });
+
+    try {
+      let response = await fetch("/user/add", { 
+        method: "POST", 
+        headers: {
+        "Content-Type": "application/json",
+        },
+        body: data 
+      });
+    } catch (error) {
+      console.error("Lỗi khi gửi request:", error);
+    }
+  });
+});
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
+
+    <main>
+      <form
+        action="/user/add"
+        method="post"
+        id="userForm"
+        enctype="multipart/form-data"
+      >
+        <label for="name">name</label>
+        <input id="name" type="text" name="name" />
+        <label for="password">password</label>
+        <input id="password" type="text" name="password" />
+        <label for="role">role</label>
+        <select name="role" id="role">
+          <option value="admin">admin</option>
+          <option value="teacher">teacher</option>
+        </select>
+        <label>Photos <input type="file" name="photo" multiple /></label>
+
+        <input id="" type="submit" value="Submit" />
+        <input id="" type="reset" value="Reset" />
+      </form>
+    </main>
+
+    <footer><%- include('../partials/footer'); %></footer>
+  </body>
+</html>

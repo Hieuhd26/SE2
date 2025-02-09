@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
+
+    <main>
+      <div class="jumbotron">
+        <h1>All user</h1>
+        <a href="/user/add" role="button">Add User</a>
+
+        <ul>
+          <% result.forEach(element => { %>
+          <li>
+            <p><strong><%= element.id %></strong></p>
+            <p><strong><%= element.name %></strong></p>
+            <p><strong><%= element.role %></strong></p>
+          </li>
+          <% }) %>
+        </ul>
+      </div>
+    </main>
+
+    <footer><%- include('../partials/footer'); %></footer>
+  </body>
+</html>
