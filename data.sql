@@ -2,6 +2,7 @@ CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name NVARCHAR(100),
     password VARCHAR(255) NOT NULL,
+    status VARCHAR(10) NOT NULL,
     role VARCHAR(50) CHECK (role IN ('teacher', 'admin'))
 );
 
@@ -38,9 +39,9 @@ CREATE TABLE project_images (
 );
 
 
-INSERT INTO users (name, password, role) VALUES
-('Quân', 'wBYnEHEm9fXZERUZ3r+f4g==', 'admin'),
-('Hiệu', 'ObGdRzsnqA4xq1ZKRKDdPw==', 'teacher');
+INSERT INTO users (name, password, role,status) VALUES
+('Quân', 'wBYnEHEm9fXZERUZ3r+f4g==', 'admin','true'),
+('Hiệu', 'ObGdRzsnqA4xq1ZKRKDdPw==', 'teacher','true');
 
 INSERT INTO projects (name, semester, year, course, created_by) VALUES
 ('Car Project', 'Spring', '2025', 'SE2', 2),

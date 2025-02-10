@@ -1,25 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <%- include('../partials/head'); %>
-</head>
-<body class="container">
+  <head>
+    <%- include('../partials/head'); %>
+    <style>
+      #previewContainer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .preview-item {
+        position: relative;
+        display: inline-block;
+      }
+      .preview-item img {
+        width: 100px;
+        height: auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .remove-btn {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: red;
+        color: white;
+        border: none;
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        font-size: 12px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
 
-<header>
-  <%- include('../partials/header'); %>
-</header>
+    <main>
+      <div class="jumbotron">
+        <button id="toggle">Show Form</button>
+        <div class="d-none" id="projectForm">
+          <form action="/project/add" method="post" enctype="multipart/form-data">
+            <label for="name">Project Name</label>
+            <input id="name" type="text" name="name" />
 
-<main>
-  <div class="jumbotron">
-    <a href="/project/add" role="button">Add Project</a>
-    <h1>This is great</h1>
-    <p>Welcome to templating using EJS</p>
-  </div>
-</main>
+            <label for="semester">Semester</label>
+            <select name="semester" id="semester">
+              <option value="fall">Fall</option>
+              <option value="spring">Spring</option>
+            </select>
 
-<footer>
-  <%- include('../partials/footer'); %>
-</footer>
+            <label for="year">Year</label>
+            <input id="year" type="number" name="year" min="2000" max="2100" placeholder="YYYY" />
 
-</body>
+            <label for="course">Course</label>
+            <select name="course" id="course">
+              <option value="SE2">SE2</option>
+              <option value="SQA">SQA</option>
+            </select>
+
+            <label> Photos: </label>
+            <input type="file" id="photoUpload" name="photos" multiple />
+
+            <!-- Hiển thị ảnh -->
+            <div id="previewContainer"></div>
+
+            <hr />
+
+            <input type="submit" value="Upload Project" />
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer><%- include('../partials/footer'); %></footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let form = document.querySelector("#projectForm");
+        let toggleButton = document.querySelector("#toggle");
+    
+        toggleButton.addEventListener("click", function () {
+          form.classList.toggle("d-none");
+          toggleButton.innerHTML = form.classList.contains("d-none") ? "Show Form" : "Hide Form";
+        });
+    
+        let photoUpload = document.getElementById("photoUpload");
+        let previewContainer = document.getElementById("previewContainer");
+        let selectedFiles = [];
+    
+        // Khi chọn ảnh
+        photoUpload.addEventListener("change", function (event) {
+          const files = Array.from(event.target.files);
+          selectedFiles = files; 
+          updatePreview();
+        });
+    
+        function updatePreview() {
+          previewContainer.innerHTML = ""; // Xóa ảnh cũ
+    
+          selectedFiles.forEach((file, index) => {
+            if (file.type.startsWith("image/")) {
+              let reader = new FileReader();
+              reader.onload = function (e) {
+                let div = document.createElement("div");
+                div.classList.add("preview-item");
+    
+                let img = document.createElement("img");
+                img.src = e.target.result;
+    
+                let removeBtn = document.createElement("button");
+                removeBtn.innerHTML = "x";
+                removeBtn.classList.add("remove-btn");
+    
+                // Xóa ảnh khỏi danh sách selectedFiles
+                removeBtn.addEventListener("click", function () {
+                  selectedFiles.splice(index, 1);
+                  updatePreview(); // Cập nhật lại danh sách
+                  updateFileInput(); // Cập nhật lại input[type=file]
+                });
+    
+                div.appendChild(img);
+                div.appendChild(removeBtn);
+                previewContainer.appendChild(div);
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+        }
+    
+        function updateFileInput() {
+          let dataTransfer = new DataTransfer();
+          selectedFiles.forEach(file => dataTransfer.items.add(file));
+          photoUpload.files = dataTransfer.files; // Cập nhật input[type=file]
+        }
+      });
+    </script>
+  </body>
 </html>
