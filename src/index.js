@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const { encrypted, decrypted } = require("./crypto");
 const multer = require("multer");
 const path = require("path");
+const { log } = require("console");
 const app = express();
 
 const storage = multer.diskStorage({
@@ -58,9 +59,12 @@ app.post("/user/add", async function (req, res) {
   }
 });
 
-app.post("/addProject", upload.single("image"), function (req, res) {
-  res.send(req.body);
-  res.send(req.file);
+app.post("/addProject", upload.array("files"), function (req, res) {
+  const { name, semester,year,course,students}=req.body
+
+  console.log(name,semester,year,course);
+  console.log(students);
+  console.log(req.files);
 });
 
 app.listen(process.env.PORT);

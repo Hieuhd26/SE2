@@ -57,7 +57,7 @@
           </div>
           <div>
             <label> Files: </label>
-            <input type="file" id="file" class="file" name="file" multiple />
+            <input type="file" id="file" class="file" name="file" multiple  />
           </div>
 
           <div>
@@ -104,7 +104,8 @@
         const container = document.getElementById("studentsContainer");
         const addStudentBtn = document.querySelector("#addStudentBtn");
         const removeStudentBtn = document.querySelector("#removeStudentBtn");
-        addStudentBtn.addEventListener("click", function () {
+        addStudentBtn.addEventListener("click", function (event) {
+          event.preventDefault()
           const row = document.createElement("div");
           row.classList.add("student-row");
 
@@ -126,29 +127,33 @@
           .querySelector("#userForm")
           .addEventListener("submit", async function (event) {
             event.preventDefault();
-
+            let data = new FormData();
             let name = document.querySelector("#name").value;
             let semester = document.querySelector("#semester").value;
             let year = document.querySelector("#year").value;
             let course = document.querySelector("#course").value;
-            let student = document.querySelector("#student").value;
-            const files = document.getElementById("file");
-            let studentNames = document.querySelectorAll(
-              'input[name="student_name[]"]'
-            );
-            let studentIds = document.querySelectorAll(
-              'input[name="student_id[]"]'
-            );
 
-            let data = new FormData();
-            data.append("user", name);
+            const files = document.getElementById("file");
+            document.querySelectorAll(".student-row").forEach((row, index) => {
+              const name = row.querySelector(
+                'input[name^="students"][name$="[name]"]'
+              ).value;
+              const id = row.querySelector(
+                'input[name^="students"][name$="[id]"]'
+              ).value;
+
+              data.append(`students[${index}][name]`, name);
+              data.append(`students[${index}][id]`, id);
+            });
+
+            data.append("name", name);
             data.append("semester", semester);
             data.append("year", year);
             data.append("course", course);
             for (let i = 0; i < files.files.length; i++) {
               data.append("files", files.files[i]);
             }
-            let response = await fetch("/project/add", {
+            let response = await fetch("/addProject", {
               method: "POST",
               body: data,
             });
