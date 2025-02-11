@@ -1,21 +1,32 @@
 "use strict";
 const express = require("express");
 const connection = require("./dbconnect");
+require("dotenv").config();
+const cookieParser = require("cookie-parser");
 const { encrypted, decrypted } = require("./crypto");
-
+const multer = require("multer");
+const path = require("path");
 const app = express();
 
-require("dotenv").config();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../tmp/")); 
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname); 
+  },
+});
 
-const multer = require("multer");
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(multer().none());
-
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
+const upload = multer({ storage: storage });
 
 app.set("view engine", "ejs");
+
+app.use(cookieParser());
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.use("/filepond", express.static("public"));
 
 app.get("/home", function (req, res) {
   res.render("./pages/home");
@@ -47,14 +58,9 @@ app.post("/user/add", async function (req, res) {
   }
 });
 
-app.post(
-  "/project/add",
-  multer({ dest: "uploads/" }).single("avatar"),
-  async (req, res) => {
-    let ava = req.file;
-    await fs.rename(ava.path, "public/images/" + ava.originalname);
-    res.send("Upload complete!");
-  }
-);
+app.post("/addProject", upload.single("image"), function (req, res) {
+  res.send(req.body);
+  res.send(req.file);
+});
 
 app.listen(process.env.PORT);
