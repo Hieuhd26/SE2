@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
+
+    <main>
+    
+        <h1><%= projectInfo.name %></h1>
+        <p><strong>Kỳ học:</strong> <%= projectInfo.semester %> (<%= projectInfo.year %>)</p>
+        <p><strong>Môn học:</strong> <%= projectInfo.course %></p>
+        <p><strong>Người tạo:</strong> <%= projectInfo.creator.name %></p>
+    
+        <h2>Sinh viên tham gia:</h2>
+        <ul>
+            <% projectInfo.students.forEach(student => { %>
+                <li><%= student.student_id %> - <%= student.student_name %></li>
+            <% }) %>
+        </ul>
+    
+        <h2>Hình ảnh dự án:</h2>
+        <% if (projectInfo.images.length > 0) { %>
+            <% projectInfo.images.forEach(img => { %>
+              <img src="/uploads/<%= img.image_url %>" width="200" alt="Project Image">
+            <% }) %>
+        <% } else { %>
+            <p>Không có ảnh nào.</p>
+        <% } %>
+    
+        <br><a href="/projects">Quay lại</a>
+
+    <footer><%- include('../partials/footer'); %></footer>
+  </body>
+</html>

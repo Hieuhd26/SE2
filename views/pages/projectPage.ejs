@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách dự án</title>
+    <!-- <link rel="stylesheet" href="/styles.css"> -->
+    <%- include('../partials/head'); %>
+</head>
+<body>
+    <header><%- include('../partials/header'); %></header>
+    <div class="container">
+        <h1>Danh sách dự án</h1>
+
+        <form method="GET" action="/projects">
+            <input type="hidden" name="page" value="<%= page %>">
+            <input type="hidden" name="limit" value="2">
+
+            <label for="sortBy">Sắp xếp theo:</label>
+            <select name="sortBy" id="sortBy" onchange="this.form.submit()">
+                <option value="id" <%= sortBy === "id" ? "selected" : "" %>>ID</option>
+                <option value="name" <%= sortBy === "name" ? "selected" : "" %>>Tên</option>
+                <option value="course" <%= sortBy === "course" ? "selected" : "" %>>Khóa học</option>
+            </select>
+
+            <select name="order" id="order" onchange="this.form.submit()">
+                <option value="asc" <%= order === "ASC" ? "selected" : "" %>>Tăng dần</option>
+                <option value="desc" <%= order === "DESC" ? "selected" : "" %>>Giảm dần</option>
+            </select>
+        </form>
+
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Tên dự án</th>
+                <th>Khóa học</th>
+            </tr>
+            <% projects.forEach(project => { %>
+                <tr>
+                    <td><a href="/projects/<%= project.id %>"><%= project.id %></a></td>
+                    <td><%= project.name %></td>
+                    <td><%= project.course %></td>
+                </tr>
+            <% }) %>
+        </table>
+
+        <div class="pagination">
+            <% if (page > 1) { %>
+                <a href="/projects?page=<%= page - 1 %>&limit=2&sortBy=<%= sortBy %>&order=<%= order %>">Trang trước</a>
+            <% } %>
+            
+            <span>Trang <%= page %> / <%= totalPages %></span>
+
+            <% if (page < totalPages) { %>
+                <a href="/projects?page=<%= page + 1 %>&limit=2&sortBy=<%= sortBy %>&order=<%= order %>">Trang sau</a>
+            <% } %>
+        </div>
+    </div>
+    <footer><%- include('../partials/footer'); %></footer>
+</body>
+</html>

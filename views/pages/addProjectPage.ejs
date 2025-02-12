@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
+
+    <main>
+      <form
+        id="userForm"
+        action="/project/add"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <div>
+          <label for="name">Project Name</label>
+          <input id="name" type="text" name="name" />
+        </div>
+        <div>
+          <label for="semester">Semester</label>
+          <select name="semester" id="semester">
+            <option value="fall">Fall</option>
+            <option value="spring">Spring</option>
+          </select>
+        </div>
+        <div>
+          <label for="year">Year</label>
+          <input
+            id="year"
+            type="number"
+            name="year"
+            min="2000"
+            max="2100"
+            placeholder="YYYY"
+          />
+        </div>
+        <div>
+          <label for="course">Course</label>
+          <select name="course" id="course">
+            <option value="SE2">SE2</option>
+            <option value="SQA">SQA</option>
+          </select>
+        </div>
+        <div>
+          <label> Files: </label>
+          <input type="file" id="file" class="file" name="file" multiple />
+        </div>
+
+        <div>
+          <h3>Danh sách sinh viên</h3>
+          <div id="studentsContainer">
+            <div class="student-row">
+              <input
+                type="text"
+                name="students[0][name]"
+                placeholder="Tên sinh viên"
+              />
+              <input
+                type="text"
+                name="students[0][id]"
+                placeholder="Mã sinh viên"
+              />
+              <button class="removeStudentBtn">X</button>
+            </div>
+          </div>
+
+          <br />
+          <button id="addStudentBtn">Thêm sinh viên</button>
+        </div>
+        <br />
+        <input type="submit" value="Upload Project" />
+      </form>
+    </main>
+
+    <footer><%- include('../partials/footer'); %></footer>
+    <script>
+        window.addEventListener("load", function () {
+          let studentIndex = 1;
+          const container = document.getElementById("studentsContainer");
+          const addStudentBtn = document.querySelector("#addStudentBtn");
+          const removeStudentBtn = document.querySelector("#removeStudentBtn");
+          addStudentBtn.addEventListener("click", function (event) {
+            event.preventDefault();
+            const row = document.createElement("div");
+            row.classList.add("student-row");
+  
+            row.innerHTML = `
+                  <input type="text" name="students[${studentIndex}][name]" placeholder="Tên sinh viên" >
+                  <input type="text" name="students[${studentIndex}][id]" placeholder="Mã sinh viên" >
+                  <button class="removeStudentBtn">X</button>
+              `;
+  
+            container.appendChild(row);
+            studentIndex++;
+          });
+          container.addEventListener("click", function (event) {
+            if (event.target.classList.contains("removeStudentBtn")) {
+              event.target.parentElement.remove();
+            }
+          });
+          document
+            .querySelector("#userForm")
+            .addEventListener("submit", async function (event) {
+              event.preventDefault();
+              let data = new FormData();
+              const students = [];
+              document.querySelectorAll(".student-row").forEach((row) => {
+                const name = row.querySelector(
+                  'input[name^="students"][name$="[name]"]'
+                ).value;
+                const id = row.querySelector(
+                  'input[name^="students"][name$="[id]"]'
+                ).value;
+  
+                students.push({ name, id });
+              });
+  
+              // Chuyển danh sách sinh viên thành chuỗi JSON
+              data.append("students", JSON.stringify(students));
+              let name = document.querySelector("#name").value;
+              let semester = document.querySelector("#semester").value;
+              let year = document.querySelector("#year").value;
+              let course = document.querySelector("#course").value;
+  
+              const files = document.getElementById("file");
+  
+              data.append("name", name);
+              data.append("semester", semester);
+              data.append("year", year);
+              data.append("course", course);
+              for (let i = 0; i < files.files.length; i++) {
+                data.append("files", files.files[i]);
+              }
+              let response = await fetch("/addProject", {
+                method: "POST",
+                body: data,
+              });
+            });
+        });
+      </script>
+  </body>
+</html>

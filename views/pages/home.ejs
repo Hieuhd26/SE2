@@ -18,6 +18,9 @@
     <header><%- include('../partials/header'); %></header>
 
     <main>
+      <h1>Danh sách Dự Án</h1>
+    
+      
       <button id="toggle">Show Form</button>
       <div class="d-none" id="form">
         <form
@@ -57,7 +60,7 @@
           </div>
           <div>
             <label> Files: </label>
-            <input type="file" id="file" class="file" name="file" multiple  />
+            <input type="file" id="file" class="file" name="file" multiple />
           </div>
 
           <div>
@@ -105,7 +108,7 @@
         const addStudentBtn = document.querySelector("#addStudentBtn");
         const removeStudentBtn = document.querySelector("#removeStudentBtn");
         addStudentBtn.addEventListener("click", function (event) {
-          event.preventDefault()
+          event.preventDefault();
           const row = document.createElement("div");
           row.classList.add("student-row");
 
@@ -128,13 +131,8 @@
           .addEventListener("submit", async function (event) {
             event.preventDefault();
             let data = new FormData();
-            let name = document.querySelector("#name").value;
-            let semester = document.querySelector("#semester").value;
-            let year = document.querySelector("#year").value;
-            let course = document.querySelector("#course").value;
-
-            const files = document.getElementById("file");
-            document.querySelectorAll(".student-row").forEach((row, index) => {
+            const students = [];
+            document.querySelectorAll(".student-row").forEach((row) => {
               const name = row.querySelector(
                 'input[name^="students"][name$="[name]"]'
               ).value;
@@ -142,9 +140,17 @@
                 'input[name^="students"][name$="[id]"]'
               ).value;
 
-              data.append(`students[${index}][name]`, name);
-              data.append(`students[${index}][id]`, id);
+              students.push({ name, id });
             });
+
+            // Chuyển danh sách sinh viên thành chuỗi JSON
+            data.append("students", JSON.stringify(students));
+            let name = document.querySelector("#name").value;
+            let semester = document.querySelector("#semester").value;
+            let year = document.querySelector("#year").value;
+            let course = document.querySelector("#course").value;
+
+            const files = document.getElementById("file");
 
             data.append("name", name);
             data.append("semester", semester);

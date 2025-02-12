@@ -17,14 +17,13 @@ CREATE TABLE projects (
 );
 
 CREATE TABLE students (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    student_code VARCHAR(20) UNIQUE NOT NULL,
-    full_name NVARCHAR(255) NOT NULL
+    id VARCHAR(20) PRIMARY KEY NOT NULL,
+    name NVARCHAR(255) NOT NULL
 );
 
 CREATE TABLE project_students (
     project_id INT,
-    student_id INT,
+    student_id VARCHAR(20) ,
     PRIMARY KEY (project_id, student_id),
     FOREIGN KEY (project_id) REFERENCES projects(id),
     FOREIGN KEY (student_id) REFERENCES students(id)
@@ -35,7 +34,7 @@ CREATE TABLE project_images (
     project_id INT,
     image_url VARCHAR(500) NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+    FOREIGN KEY (project_id) REFERENCES projects(id)
 );
 
 
@@ -47,13 +46,13 @@ INSERT INTO projects (name, semester, year, course, created_by) VALUES
 ('Car Project', 'Spring', '2025', 'SE2', 2),
 ('Web Development Project', 'Fall', '2024', 'SQA', 2);
 
-INSERT INTO students (student_code, full_name) VALUES
+INSERT INTO students (id, name) VALUES
 ('2101140026', 'Nguyen Van A'),
 ('2101140027', 'Tran Thi B'),
 ('2101140028', 'Le Hoang C');
 
 INSERT INTO project_students (project_id, student_id) VALUES
-(1, 1), (1, 2), (2, 2), (2, 3);
+(1, "2101140026"), (1, "2101140027"), (2, "2101140028"), (1, "2101140028");
 
 
 
