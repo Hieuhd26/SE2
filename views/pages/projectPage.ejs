@@ -1,62 +1,158 @@
-
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách dự án</title>
-    <!-- <link rel="stylesheet" href="/styles.css"> -->
-    <%- include('../partials/head'); %>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách dự án</title>
+  <!-- <link rel="stylesheet" href="/styles.css"> -->
+  <%- include('../partials/head'); %>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+
+      .pagination {
+        display: inline-block;
+      }
+
+      .pagination button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        margin: 2px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      .pagination button:hover {
+        background-color: #0056b3;
+      }
+
+      .pagination button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .pagination .active {
+        background-color: #28a745;
+      }
+    </style>
 </head>
+
 <body>
-    <header><%- include('../partials/header'); %></header>
-    <div class="container">
-        <h1>Danh sách dự án</h1>
+  <header><%- include('../partials/header'); %></header>
+  <div class="container">
+    <h1><a href="/addProjectPage">Thêm dự án</a></h1>
+    <h1>Danh sách dự án</h1>
 
-        <form method="GET" action="/projects">
-            <input type="hidden" name="page" value="<%= page %>">
-            <input type="hidden" name="limit" value="2">
+    <!-- Phần lọc dữ liệu -->
+    <div class="filter">
+      <label for="search">Tìm kiếm:</label>
+      <input type="text" id="search" value="<%= search %>">
 
-            <label for="sortBy">Sắp xếp theo:</label>
-            <select name="sortBy" id="sortBy" onchange="this.form.submit()">
-                <option value="id" <%= sortBy === "id" ? "selected" : "" %>>ID</option>
-                <option value="name" <%= sortBy === "name" ? "selected" : "" %>>Tên</option>
-                <option value="course" <%= sortBy === "course" ? "selected" : "" %>>Khóa học</option>
-            </select>
+      <label for="sortBy">Sắp xếp theo:</label>
+      <select id="sortBy">
+        <option value="id" <%=sortBy==="id" ? "selected" : "" %>>ID</option>
+        <option value="name" <%=sortBy==="name" ? "selected" : "" %>>Tên</option>
+        <option value="course" <%=sortBy==="course" ? "selected" : "" %>>Khóa học</option>
+        <option value="year" <%=sortBy==="year" ? "selected" : "" %>>Năm học</option>
+      </select>
 
-            <select name="order" id="order" onchange="this.form.submit()">
-                <option value="asc" <%= order === "ASC" ? "selected" : "" %>>Tăng dần</option>
-                <option value="desc" <%= order === "DESC" ? "selected" : "" %>>Giảm dần</option>
-            </select>
-        </form>
-
-        <table border="1">
-            <tr>
-                <th>ID</th>
-                <th>Tên dự án</th>
-                <th>Khóa học</th>
-            </tr>
-            <% projects.forEach(project => { %>
-                <tr>
-                    <td><a href="/projects/<%= project.id %>"><%= project.id %></a></td>
-                    <td><%= project.name %></td>
-                    <td><%= project.course %></td>
-                </tr>
-            <% }) %>
-        </table>
-
-        <div class="pagination">
-            <% if (page > 1) { %>
-                <a href="/projects?page=<%= page - 1 %>&limit=2&sortBy=<%= sortBy %>&order=<%= order %>">Trang trước</a>
-            <% } %>
-            
-            <span>Trang <%= page %> / <%= totalPages %></span>
-
-            <% if (page < totalPages) { %>
-                <a href="/projects?page=<%= page + 1 %>&limit=2&sortBy=<%= sortBy %>&order=<%= order %>">Trang sau</a>
-            <% } %>
-        </div>
+      <select id="order">
+        <option value="asc" <%=order==="asc" ? "selected" : "" %>>Tăng dần</option>
+        <option value="desc" <%=order==="desc" ? "selected" : "" %>>Giảm dần</option>
+      </select>
     </div>
-    <footer><%- include('../partials/footer'); %></footer>
+
+    <!-- Hiển thị dữ liệu nếu có -->
+    <% if (projects.length> 0) { %>
+      <table border="1">
+        <tr>
+          <th>ID</th>
+          <th>Tên dự án</th>
+          <th>Khóa học</th>
+          <th>Năm học</th>
+        </tr>
+        <% projects.forEach(project=> { %>
+          <tr>
+            <td><a href="/projects/<%= project.id %>">
+                <%= project.id %>
+              </a></td>
+            <td>
+              <%= project.name %>
+            </td>
+            <td>
+              <%= project.course %>
+            </td>
+            <td>
+              <%= project.year %>
+            </td>
+          </tr>
+          <% }) %>
+      </table>
+
+      <!-- Phân trang -->
+      <div class="pagination">
+        <% if (page> 1) { %>
+          <a
+            href="/projects?page=<%= page - 1 %>&limit=2&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Pre</a>
+          <% } %>
+
+            <% let pages=[]; if (totalPages <=5) { pages=Array.from({ length: totalPages }, (_, i)=> i + 1);
+              } else if (page <= 3) { pages=[1, 2, 3, 4, 5]; } else if (page>= totalPages - 2) {
+                pages = [totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+                } else {
+                pages = [page - 2, page - 1, page, page + 1, page + 2];
+                }
+                %>
+
+                <% pages.forEach(p=> { %>
+                  <a href="/projects?page=<%= p %>&limit=2&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>"
+                    class="<%= p === page ? 'active' : '' %>">
+                    <%= p %>
+                  </a>
+                  <% }) %>
+
+                    <% if (page < totalPages) { %>
+                      <a
+                        href="/projects?page=<%= page + 1 %>&limit=2&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Next</a>
+                      <% } %>
+      </div>
+      <% } else { %>
+        <p style="color: red;">Không có kết quả phù hợp</p>
+        <% } %>
+  </div>
+
+  <footer><%- include('../partials/footer'); %></footer>
+
+  <!-- Hàm lọc dữ liệu được tách riêng -->
+  <script>
+    function filterProjects() {
+      const searchInput = document.getElementById("search");
+      const sortBySelect = document.getElementById("sortBy");
+      const orderSelect = document.getElementById("order");
+
+      const params = new URLSearchParams(window.location.search);
+      params.set("search", searchInput.value);
+      params.set("sortBy", sortBySelect.value);
+      params.set("order", orderSelect.value);
+      params.set("page", 1); // reset về trang đầu tiên khi lọc
+
+      window.location.href = "/projects?" + params.toString();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Gọi hàm filterProjects() khi các trường thay đổi
+      document.getElementById("search").addEventListener("change", filterProjects);
+      document.getElementById("sortBy").addEventListener("change", filterProjects);
+      document.getElementById("order").addEventListener("change", filterProjects);
+    });
+  </script>
 </body>
+
+
 </html>

@@ -43,7 +43,19 @@ INSERT INTO users (name, password, role,status) VALUES
 ('Hiệu', 'ObGdRzsnqA4xq1ZKRKDdPw==', 'teacher','true');
 
 INSERT INTO projects (name, semester, year, course, created_by) VALUES
-('Car Project', 'Spring', '2025', 'SE2', 2),
+('Car Project 1', 'Spring', '2025', 'SE2', 2),
+('Car Project 2', 'Spring', '2024', 'SE2', 2),
+('Car Project 3', 'Spring', '2025', 'SQA', 2),
+('Car Project 4', 'Spring', '2024', 'SQA', 2),
+('Car Project 5', 'Spring', '2025', 'SE2', 2),
+('Car Project 6', 'Spring', '2024', 'SE2', 2),
+('Car Project 7', 'Spring', '2024', 'SQA', 2),
+('Car Project 8', 'Spring', '2025', 'SQA', 2),
+('Car Project 9', 'Spring', '2024', 'SQA', 2),
+('Car Project 10', 'Spring', '2024', 'SE2', 2),
+('Car Project 11', 'Spring', '2024', 'SQA', 2),
+('Car Project 12', 'Spring', '2025', 'SE2', 2),
+
 ('Web Development Project', 'Fall', '2024', 'SQA', 2);
 
 INSERT INTO students (id, name) VALUES

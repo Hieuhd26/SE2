@@ -3,11 +3,12 @@ const express = require("express");
 const connection = require("./dbconnect");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
-const { encrypted, decrypted } = require("./crypto");
 const multer = require("multer");
 const path = require("path");
 const app = express();
 const AppError = require("./AppError");
+const bcrypt = require("bcryptjs");
+const userRoutes = require("./userRoutes");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -23,40 +24,69 @@ const upload = multer({ storage: storage });
 app.set("view engine", "ejs");
 
 app.use(cookieParser());
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use("/users", userRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
 
-app.get("/bad-request", (req, res, next) => {
-  next(new AppError("Yêu cầu không hợp lệ!", 400));
+
+app.get("/login", (req, res) => {
+  res.render("pages/loginPage");
 });
-app.get("/projects", async function (req, res) {
+
+// Xử lý đăng nhập
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const [users] = await connection.query("SELECT * FROM users WHERE name = ? and status ='true'", [username]);
+    if (users.length === 0) return res.render("pages/loginPage", { error: "Sai tài khoản hoặc mật khẩuu hoặc tài khoản bị khóa" });
+
+    const user = users[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.render("pages/loginPage", { error: "Sai tài khoản hoặc mật khẩu!" });
+
+    // Lưu userId vào cookie
+    res.cookie("userId", user.id, { httpOnly: true, maxAge: 3600000 });
+    res.redirect("/projects");
+  } catch (err) {
+    res.status(500).send("Lỗi server!");
+  }
+});
+
+// Xử lý đăng xuất
+app.get("/logout", (req, res) => {
+  res.clearCookie("userId");
+  res.redirect("/login");
+});
+
+
+
+app.get("/projects"
+  //, requireAuth
+  , async function (req, res, next) {
   try {
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(req.query.limit) || 2; // Mặc định 2 dự án/trang
+    let limit = parseInt(req.query.limit) || 2;
     let offset = (page - 1) * limit;
-
-    // Lấy giá trị sortBy và order, mặc định là id ASC
-    let validColumns = ["id", "name", "course"]; // Chỉ cho phép sắp xếp theo các cột này
+    let validColumns = ["id", "name", "course", "year"];
     let sortBy = validColumns.includes(req.query.sortBy) ? req.query.sortBy : "id";
-    let order = req.query.order === "desc" ? "DESC" : "ASC"; // Chỉ cho phép ASC hoặc DESC
-
-    // Truy vấn tổng số dự án
-    const [[{ total }]] = await connection.query("SELECT COUNT(*) AS total FROM projects");
-
-    // Truy vấn danh sách dự án có phân trang + sắp xếp
-    const [projects] = await connection.query(
-      `SELECT id, name, course FROM projects ORDER BY ${sortBy} ${order} LIMIT ? OFFSET ?`,
-      [limit, offset]
+    let order = req.query.order === "desc" ? "desc" : "asc";
+    let search = req.query.search ? `%${req.query.search}%` : "%";
+    const [[{ total }]] = await connection.query(
+      "SELECT COUNT(*) AS total FROM projects WHERE name LIKE ? OR course LIKE ?",
+      [search, search]
     );
-
+    const [projects] = await connection.query(
+      `SELECT id, name, course, year FROM projects 
+       WHERE name LIKE ? OR course LIKE ? 
+       ORDER BY ${sortBy} ${order} LIMIT ? OFFSET ?`,
+      [search, search, limit, offset]
+    );
     let totalPages = Math.ceil(total / limit);
-
-    res.render("./pages/projectPage", { projects, page, totalPages, sortBy, order });
+    res.render("./pages/projectPage", { projects, page, totalPages, sortBy, order, search: req.query.search || "" });
   } catch (err) {
-    res.status(500).send("Lỗi lấy danh sách dự án");
+    next(new AppError("Yêu cầu không hợp lệ!", 400));
   }
 });
 
@@ -64,9 +94,6 @@ app.get("/addProjectPage", function (req, res) {
   res.render("./pages/addProjectPage");
 });
 
-app.get("/home", function (req, res) {
-  res.render("./pages/home");
-});
 
 app.get("/projects/:id", async (req, res) => {
   try {
@@ -117,7 +144,6 @@ app.get("/projects/:id", async (req, res) => {
       students: student,
       images: image,
     };
-    //res.send(student)
     res.render("./pages/projectDetailPage", { projectInfo });
   } catch (err) {
     console.error(err);
@@ -125,31 +151,7 @@ app.get("/projects/:id", async (req, res) => {
   }
 });
 
-app.get("/user", async function (req, res) {
-  let sql = "SELECT id, name, role FROM users;";
-  let [result] = await connection.query(sql);
-  res.render("./pages/user", { result: result });
-});
 
-app.get("/user/add", function (req, res) {
-  res.render("./pages/addUserPage");
-});
-
-app.post("/user/add", async function (req, res) {
-  const { name, password, role } = req.body;
-  if (!name || !role) {
-    return res.status(400).json({ message: "Please input all" });
-  }
-  try {
-    let sql = "INSERT INTO users (name, password, role) VALUES (?, ?, ?)";
-    const encryptedPassword = encrypted(password);
-    let rs = await connection.query(sql, [name, encryptedPassword, role]);
-    alert("Done");
-    res.status(201).json({ message: "Done" });
-  } catch (error) {
-    res.status(500).json({ message: "Error!" });
-  }
-});
 
 app.post("/addProject", upload.array("files"), async function (req, res) {
   const { name, semester, year, course } = req.body;
@@ -203,7 +205,7 @@ app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Đã có lỗi xảy ra!";
 
-  res.status(statusCode).render("./pages/error", { statusCode, message });
+  res.status(statusCode).render("./pages/errorPage", { statusCode, message });
 });
 
 app.listen(process.env.PORT);
