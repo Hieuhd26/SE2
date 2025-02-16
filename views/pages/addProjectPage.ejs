@@ -9,7 +9,7 @@
     <main>
       <form
         id="userForm"
-        action="/project/add"
+        action="/projects/add"
         method="post"
         enctype="multipart/form-data"
       >
@@ -132,7 +132,7 @@
               for (let i = 0; i < files.files.length; i++) {
                 data.append("files", files.files[i]);
               }
-              let response = await fetch("/addProject", {
+              let response = await fetch("/projects/addProject", {
                 method: "POST",
                 body: data,
               });
