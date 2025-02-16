@@ -6,7 +6,6 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const app = express();
 const AppError = require("./AppError");
-const bcrypt = require("bcryptjs");
 
 const userRoutes = require("./userRoutes");
 const projectRoutes = require("./projectRouters");

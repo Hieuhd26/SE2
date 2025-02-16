@@ -1,36 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="vi">
+<head>
     <%- include('../partials/head'); %>
-  </head>
-  <body class="container">
+    <title>Project Detail</title>
+</head>
+<body class="bg-light">
     <header><%- include('../partials/header'); %></header>
+    <main class="container my-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h1 class="text-primary"><%= projectInfo.name %></h1>
+                <p><strong>Kỳ học:</strong> <%= projectInfo.semester %> (<%= projectInfo.year %>)</p>
+                <p><strong>Môn học:</strong> <%= projectInfo.course %></p>
+                <p><strong>Người tạo:</strong> <%= projectInfo.creator.name %></p>
+            
+                <h2 class="mt-4">Sinh viên tham gia:</h2>
+                <ul class="list-group mb-4">
+                    <% projectInfo.students.forEach(student => { %>
+                        <li class="list-group-item"><%= student.student_id %> - <%= student.student_name %></li>
+                    <% }) %>
+                </ul>
+            
+                <h2 class="mt-4">Hình ảnh dự án:</h2>
+                <% if (projectInfo.images.length > 0) { %>
+                    <div class="row">
+                        <% projectInfo.images.forEach((img, index) => { %>
+                            <div class="col-md-6 mb-3">
+                                <img src="/uploads/<%= img.image_url %>" class="img-fluid rounded shadow-sm" 
+                                     alt="Project Image" data-bs-toggle="modal" data-bs-target="#imageModal<%= index %>">
+                            </div>
 
-    <main>
-    
-        <h1><%= projectInfo.name %></h1>
-        <p><strong>Kỳ học:</strong> <%= projectInfo.semester %> (<%= projectInfo.year %>)</p>
-        <p><strong>Môn học:</strong> <%= projectInfo.course %></p>
-        <p><strong>Người tạo:</strong> <%= projectInfo.creator.name %></p>
-    
-        <h2>Sinh viên tham gia:</h2>
-        <ul>
-            <% projectInfo.students.forEach(student => { %>
-                <li><%= student.student_id %> - <%= student.student_name %></li>
-            <% }) %>
-        </ul>
-    
-        <h2>Hình ảnh dự án:</h2>
-        <% if (projectInfo.images.length > 0) { %>
-            <% projectInfo.images.forEach(img => { %>
-              <img src="/uploads/<%= img.image_url %>" width="200" alt="Project Image">
-            <% }) %>
-        <% } else { %>
-            <p>Không có ảnh nào.</p>
-        <% } %>
-    
-        <br><a href="/projects">Quay lại</a>
-
+                            <!-- Modal hiển thị ảnh lớn -->
+                            <div class="modal fade" id="imageModal<%= index %>" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-body text-center">
+                                            <img src="/uploads/<%= img.image_url %>" class="img-fluid rounded">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <p class="text-muted">Không có ảnh nào.</p>
+                <% } %>
+            
+                <br>
+                <a href="/projects" class="btn btn-secondary">Quay lại</a>
+            </div>
+        </div>
+    </main>
     <footer><%- include('../partials/footer'); %></footer>
-  </body>
+    
+</body>
 </html>

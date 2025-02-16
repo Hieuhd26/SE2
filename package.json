@@ -9,13 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^3.0.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
-    "filepond": "^4.32.7",
-    "filepond-plugin-image-preview": "^4.6.12",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.12.0"
   },

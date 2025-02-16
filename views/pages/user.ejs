@@ -2,27 +2,87 @@
 <html lang="en">
   <head>
     <%- include('../partials/head'); %>
+    <title>User</title>
   </head>
-  <body class="container">
+  <body>
     <header><%- include('../partials/header'); %></header>
-
     <main>
-      <div class="jumbotron">
+      <div class="container">
         <h1>All user</h1>
-        <a href="/users/add" role="button">Add User</a>
-
-        <ul>
-          <% result.forEach(element => { %>
-          <li>
-            <p><strong><%= element.id %></strong></p>
-            <p><strong><%= element.name %></strong></p>
-            <p><strong><%= element.role %></strong></p>
-          </li>
-          <% }) %>
-        </ul>
+        <a
+          href="/users/add"
+          class="btn btn-success d-inline-flex justify-content-center align-items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="me-1"
+            width="20px"
+            height="20px"
+            viewBox="0 0 640 512"
+          >
+            <path
+              fill="#ffffff"
+              d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM504 312l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"
+            />
+          </svg>
+          Add User</a
+        >
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Role</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% result.forEach(element => { %>
+            <tr>
+              <th scope="row"><strong><%= element.id %></strong></th>
+              <td><strong><%= element.name %></strong></td>
+              <td><strong><%= element.role %></strong></td>
+              <td>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch"
+                  id="switch-<%= element.id %>" <%= element.status === 'true' ?
+                  'checked' : '' %> onclick="toggleStatus('<%= element.id %>')"
+                  >
+                   <!-- checked> -->
+                  <!-- <label
+                    class="form-check-label"
+                    for="switch-<%= element.id %>"
+                  >
+                    <%= element.status === 'true' ? 'Active' : 'Inactive' %>
+                  </label> -->
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
       </div>
     </main>
-
     <footer><%- include('../partials/footer'); %></footer>
+    <script>
+      async function toggleStatus(userId) {
+        try {
+          let response = await fetch(`/users/toggle-status/${userId}`, {
+            method: "PATCH",
+          });
+    
+          //let result = await response.json();
+          // if (response.ok) {
+          //   // Cập nhật nhãn trạng thái
+          //   let label = document.querySelector(`#switch-${userId}`).nextElementSibling;
+          //   label.textContent = result.status === 'true' ? 'Active' : 'Inactive';
+          // } else {
+          //   alert("Error: " + result.message);
+          // }
+        } catch (error) {
+          alert("Something went wrong!");
+        }
+      }
+    </script>
   </body>
 </html>
