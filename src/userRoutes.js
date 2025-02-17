@@ -1,7 +1,8 @@
 const express = require("express");
-const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 const connection = require("./dbconnect");
 const router = express.Router();
+
 
 function hashPassword(password) {
     const salt = crypto.randomBytes(16).toString("hex"); // Tạo salt ngẫu nhiên
@@ -13,15 +14,6 @@ function verifyPassword(password, salt, hash) {
     const newHash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex");
     return newHash === hash;
 }
-
-// const password = "mypassword123";
-// const { salt, hash } = hashPassword(password);
-// console.log("Salt:", salt);
-// console.log("Hash:", hash);
-
-// // Kiểm tra password có khớp không
-// console.log("Password đúng?", verifyPassword("mypassword123", salt, hash)); // true
-// console.log("Password sai?", verifyPassword("wrongpassword", salt, hash)); // false
 
 router.get("", async function (req, res) {
     let sql = "SELECT id, name, role, status FROM users;";
@@ -40,14 +32,11 @@ router.post("/add", async function (req, res) {
     }
     try {
         
-        const {hash} = hashPassword(password)
-        console.log(hash);
-
+        const hashedPassword = await bcrypt.hash(password, 10);
         let sql = "INSERT INTO users (name, password, role, status) VALUES (?, ?, ?,'true')";
-        await connection.query(sql, [name, hash, role]);
+        await connection.query(sql, [name, hashedPassword, role]);
         res.status(201).json({ message: "Done" });
     } catch (error) {
-        console.log("lỗi rồi");
         res.status(500).json({ message: "Error!" });
     }
 });

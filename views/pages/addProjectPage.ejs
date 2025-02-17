@@ -3,6 +3,7 @@
 <head>
   <%- include('../partials/head'); %>
   <title>Add project</title>
+  <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
 </head>
 <body>
   <header><%- include('../partials/header'); %></header>
@@ -100,6 +101,7 @@
         data.append("semester", document.getElementById("semester").value);
         data.append("year", document.getElementById("year").value);
         data.append("course", document.getElementById("course").value);
+
         const files = document.getElementById("file").files;
         for (let i = 0; i < files.length; i++) {
           data.append("files", files[i]);
@@ -109,5 +111,6 @@
       });
     });
   </script>
+   <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
 </body>
 </html>
