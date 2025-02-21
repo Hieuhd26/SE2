@@ -3,18 +3,6 @@ const bcrypt = require("bcrypt");
 const connection = require("./dbconnect");
 const router = express.Router();
 
-
-function hashPassword(password) {
-    const salt = crypto.randomBytes(16).toString("hex"); // Tạo salt ngẫu nhiên
-    const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex"); // Hash password
-    return { salt, hash };
-}
-
-function verifyPassword(password, salt, hash) {
-    const newHash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex");
-    return newHash === hash;
-}
-
 router.get("", async function (req, res) {
     let sql = "SELECT id, name, role, status FROM users;";
     let [result] = await connection.query(sql);

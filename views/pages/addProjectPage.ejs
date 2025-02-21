@@ -1,116 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <%- include('../partials/head'); %>
-  <title>Add project</title>
-  <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
-</head>
-<body>
-  <header><%- include('../partials/header'); %></header>
-  <main class="container mt-4">
-    <div class="card p-4 shadow-sm">
-      <h2 class="text-center">Add New Project</h2>
-      <form id="userForm" action="/projects/add" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-          <label for="name" class="form-label">Project Name</label>
-          <input id="name" type="text" name="name" class="form-control" />
-        </div>
-        <div class="row">
-          <div class="col-md-4">
-            <label for="semester" class="form-label">Semester</label>
-            <select name="semester" id="semester" class="form-select">
-              <option value="fall">Fall</option>
-              <option value="spring">Spring</option>
-            </select>
+  <head>
+    <%- include('../partials/head'); %>
+    <title>Add project</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <header><%- include('../partials/header'); %></header>
+    <main class="container mt-4">
+      <div class="card p-4 shadow-sm">
+        <h2 class="text-center">Add New Project</h2>
+        <form
+          id="userForm"
+          action="/projects/add"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <div class="mb-3">
+            <label for="name" class="form-label">Project Name</label>
+            <input id="name" type="text" name="name" class="form-control" />
           </div>
-          <div class="col-md-4">
-            <label for="year" class="form-label">Year</label>
-            <input id="year" type="number" name="year" min="2000" max="2100" placeholder="YYYY" class="form-control" />
-          </div>
-          <div class="col-md-4">
-            <label for="course" class="form-label">Course</label>
-            <select name="course" id="course" class="form-select">
-              <option value="SE2">SE2</option>
-              <option value="SQA">SQA</option>
-            </select>
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Upload Files</label>
-          <input type="file" id="file" class="form-control" name="file" multiple />
-        </div>
-
-        <div class="mb-3">
-          <h4>Danh sách sinh viên</h4>
-          <div id="studentsContainer" class="border p-3 rounded bg-light">
-            <div class="student-row d-flex align-items-center mb-2">
-              <input type="text" name="students[0][name]" placeholder="Tên sinh viên" class="form-control me-2" />
-              <input type="text" name="students[0][id]" placeholder="Mã sinh viên" class="form-control me-2" />
-              <button class="btn btn-danger removeStudentBtn">X</button>
+          <div class="row">
+            <div class="col-md-4">
+              <label for="semester" class="form-label">Semester</label>
+              <select name="semester" id="semester" class="form-select">
+                <option value="fall">Fall</option>
+                <option value="spring">Spring</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="year" class="form-label">Year</label>
+              <input
+                id="year"
+                type="number"
+                name="year"
+                min="2000"
+                max="2100"
+                placeholder="YYYY"
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-4">
+              <label for="course" class="form-label">Course</label>
+              <select name="course" id="course" class="form-select">
+                <option value="SE2">SE2</option>
+                <option value="SQA">SQA</option>
+              </select>
             </div>
           </div>
-          <button id="addStudentBtn" class="btn btn-primary mt-2">Thêm sinh viên</button>
-        </div>
-        
-        <button type="submit" class="btn btn-success w-100">Upload Project</button>
-      </form>
-    </div>
-  </main>
+          <div class="mb-3">
+            <label class="form-label">Upload Files</label>
+            <input
+              type="file"
+              id="file"
+              class="form-control"
+              name="file"
+              multiple
+            />
+          </div>
 
-  <footer><%- include('../partials/footer'); %></footer>
+          <div class="mb-3">
+            <h4>Danh sách sinh viên</h4>
+            <div id="studentsContainer" class="border p-3 rounded bg-light">
+              <div class="student-row d-flex align-items-center mb-2">
+                <input
+                  type="text"
+                  name="students[0][name]"
+                  placeholder="Tên sinh viên"
+                  class="form-control me-2"
+                />
+                <input
+                  type="text"
+                  name="students[0][id]"
+                  placeholder="Mã sinh viên"
+                  class="form-control me-2"
+                />
+                <button class="btn btn-danger removeStudentBtn">X</button>
+              </div>
+            </div>
+            <button id="addStudentBtn" class="btn btn-primary mt-2">
+              Thêm sinh viên
+            </button>
+          </div>
 
-  <script>
-    window.addEventListener("load", function () {
-      let studentIndex = 1;
-      const container = document.getElementById("studentsContainer");
-      const addStudentBtn = document.getElementById("addStudentBtn");
+          <button type="submit" class="btn btn-success w-100">
+            Upload Project
+          </button>
+        </form>
+      </div>
+    </main>
 
-      addStudentBtn.addEventListener("click", function (event) {
-        event.preventDefault();
-        const row = document.createElement("div");
-        row.classList.add("student-row", "d-flex", "align-items-center", "mb-2");
+    <footer><%- include('../partials/footer'); %></footer>
 
-        row.innerHTML = `
+    <script>
+      window.addEventListener("load", function () {
+        let studentIndex = 1;
+        const container = document.getElementById("studentsContainer");
+        const addStudentBtn = document.getElementById("addStudentBtn");
+
+        addStudentBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          const row = document.createElement("div");
+          row.classList.add(
+            "student-row",
+            "d-flex",
+            "align-items-center",
+            "mb-2"
+          );
+
+          row.innerHTML = `
           <input type="text" name="students[${studentIndex}][name]" placeholder="Tên sinh viên" class="form-control me-2">
           <input type="text" name="students[${studentIndex}][id]" placeholder="Mã sinh viên" class="form-control me-2">
           <button class="btn btn-danger removeStudentBtn">X</button>
         `;
 
-        container.appendChild(row);
-        studentIndex++;
-      });
-
-      container.addEventListener("click", function (event) {
-        if (event.target.classList.contains("removeStudentBtn")) {
-          event.target.parentElement.remove();
-        }
-      });
-
-      document.getElementById("userForm").addEventListener("submit", async function (event) {
-        event.preventDefault();
-        let data = new FormData();
-        const students = [];
-        document.querySelectorAll(".student-row").forEach((row) => {
-          const name = row.querySelector('input[name^="students"][name$="[name]"]').value;
-          const id = row.querySelector('input[name^="students"][name$="[id]"]').value;
-          students.push({ name, id });
+          container.appendChild(row);
+          studentIndex++;
         });
 
-        data.append("students", JSON.stringify(students));
-        data.append("name", document.getElementById("name").value);
-        data.append("semester", document.getElementById("semester").value);
-        data.append("year", document.getElementById("year").value);
-        data.append("course", document.getElementById("course").value);
+        container.addEventListener("click", function (event) {
+          if (event.target.classList.contains("removeStudentBtn")) {
+            event.target.parentElement.remove();
+          }
+        });
 
-        const files = document.getElementById("file").files;
-        for (let i = 0; i < files.length; i++) {
-          data.append("files", files[i]);
-        }
+        document
+          .getElementById("userForm")
+          .addEventListener("submit", async function (event) {
+            event.preventDefault();
+            let data = new FormData();
+            const students = [];
+            document.querySelectorAll(".student-row").forEach((row) => {
+              const name = row.querySelector(
+                'input[name^="students"][name$="[name]"]'
+              ).value;
+              const id = row.querySelector(
+                'input[name^="students"][name$="[id]"]'
+              ).value;
+              students.push({ name, id });
+            });
 
-        let response = await fetch("/projects/addProject", { method: "POST", body: data });
+            data.append("students", JSON.stringify(students));
+            data.append("name", document.getElementById("name").value);
+            data.append("semester", document.getElementById("semester").value);
+            data.append("year", document.getElementById("year").value);
+            data.append("course", document.getElementById("course").value);
+
+            const files = document.getElementById("file").files;
+            for (let i = 0; i < files.length; i++) {
+              data.append("files", files[i]);
+            }
+            try {
+              let response = await fetch("/projects/addProject", {
+                method: "POST",
+                body: data,
+              });
+
+              if (response.ok) {
+                Swal.fire({
+                  title: "Thành công!",
+                  text: "Dự án đã được thêm thành công.",
+                  icon: "success",
+                  confirmButtonText: "OK",
+                }).then(() => {
+                  window.location.href = "/projects"; // Điều hướng sau khi đóng thông báo
+                });
+              } else {
+                Swal.fire({
+                  title: "Lỗi!",
+                  text: "Có lỗi xảy ra khi thêm dự án.",
+                  icon: "error",
+                  confirmButtonText: "Thử lại",
+                });
+              }
+            } catch (error) {
+              Swal.fire({
+                title: "Lỗi!",
+                text: "Không thể kết nối đến máy chủ.",
+                icon: "error",
+                confirmButtonText: "Thử lại",
+              });
+            }
+          });
       });
-    });
-  </script>
-   <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
-</body>
+    </script>
+  </body>
 </html>

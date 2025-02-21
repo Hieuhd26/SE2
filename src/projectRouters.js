@@ -2,7 +2,9 @@ const express = require("express");
 const connection = require("./dbconnect");
 require("dotenv").config();
 const router = express.Router();
+const AppError = require("./AppError");
 const path = require("path");
+
 const authMiddleware = require("./authMiddleware");
 const multer = require("multer");
 const storage = multer.diskStorage({
@@ -17,12 +19,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get(
-  "",
-  //, requireAuth
-  async function (req, res, next) {
+  "", async function (req, res, next) {
     try {
       let page = parseInt(req.query.page) || 1;
-      let limit = parseInt(req.query.limit) || 2;
+      let limit = parseInt(req.query.limit) || 5;
       let offset = (page - 1) * limit;
       let validColumns = ["id", "name", "course", "year"];
       let sortBy = validColumns.includes(req.query.sortBy)
@@ -40,6 +40,23 @@ router.get(
        ORDER BY ${sortBy} ${order} LIMIT ? OFFSET ?`,
         [search, search, limit, offset]
       );
+
+      const projectIds = projects.map((p) => p.id);
+      const [imageResults] = await connection.query(
+        `SELECT project_id, image_url FROM project_images WHERE project_id IN (?)`,
+        [projectIds]
+      );
+
+      const imageMap = {};
+      imageResults.forEach((img) => {
+        if (!imageMap[img.project_id]) {
+          imageMap[img.project_id] = [];
+        }
+        imageMap[img.project_id].push(img.image_url);
+      });
+      projects.forEach((project) => {
+        project.images = imageMap[project.id] || [];
+      });
       let totalPages = Math.ceil(total / limit);
       res.render("./pages/projectPage", {
         projects,
@@ -54,22 +71,27 @@ router.get(
     }
   }
 );
+
 router.use(authMiddleware);
 router.get("/addProjectPage", function (req, res) {
   res.render("./pages/addProjectPage");
 });
 
-router.post("/addProject", upload.array("files"), async function (req, res) {
+router.post("/addProject", upload.array("files"), async function (req, res,next) {
   const { name, semester, year, course } = req.body;
   const studentsList = JSON.parse(req.body.students);
   const files = req.files;
 
   try {
     await connection.beginTransaction();
+    const userId = req.cookies.userId;
+    if (!userId) {
+      return res.status(401).send("You have to login");
+    }
 
     const [projectResult] = await connection.execute(
       "INSERT INTO projects (name, semester, year, course, created_by) VALUES (?, ?, ?, ?, ?)",
-      [name, semester, year, course, 2]
+      [name, semester, year, course, userId]
     );
     const projectId = projectResult.insertId;
 
@@ -94,13 +116,11 @@ router.post("/addProject", upload.array("files"), async function (req, res) {
     }
 
     await connection.commit();
-
     res.status(201).json({ message: "Project added successfully!" });
   } catch (error) {
-    // Nếu có lỗi, rollback transaction
     await connection.rollback();
-    console.error(error);
     res.status(500).json({ message: "Error adding project", error });
+    next(new AppError("Error in adding projects", 500));
   }
 });
 
@@ -138,7 +158,7 @@ router.get("/:id", async (req, res) => {
     const [image] = await connection.execute(sql_image, [req.params.id]);
 
     if (user.length === 0 && student.length === 0 && image.length === 0) {
-      return res.status(404).send("Dự án không tồn tại");
+      next(new AppError("Not found", 404));
     }
 
     const projectInfo = {
@@ -155,8 +175,7 @@ router.get("/:id", async (req, res) => {
     };
     res.render("./pages/projectDetailPage", { projectInfo });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Lỗi lấy chi tiết dự án");
+    next(new AppError("Error in getting detail projects", 500));
   }
 });
 

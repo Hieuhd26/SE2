@@ -3,6 +3,7 @@
 <head>
   <%- include('../partials/head'); %>
   <title>Projects</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <header><%- include('../partials/header'); %></header>
@@ -42,39 +43,37 @@
 
     <!-- Hiển thị dữ liệu -->
     <% if (projects.length > 0) { %>
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Tên dự án</th>
-              <th>Khóa học</th>
-              <th>Năm học</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% projects.forEach(project => { %>
-              <tr>
-                <td><a href="/projects/<%= project.id %>" class="text-decoration-none"><%= project.id %></a></td>
-                <td><%= project.name %></td>
-                <td><%= project.course %></td>
-                <td><%= project.year %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
+      <div class="row">
+        <% projects.forEach(project => { %>
+          <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+               <!-- Ảnh đại diện -->
+          <% if (project.images && project.images.length > 0) { %>
+            <img src="/uploads/<%= project.images[0] %>" class="card-img-top img-fluid project-img" alt="Ảnh dự án" style="height: 200px; object-fit: cover;">
+          <% } else { %>
+            <img src="https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/hinh-anh-thien-nhien-dep-3d-001.jpg" class="card-img-top img-fluid project-img" style="height: 200px; object-fit: cover;" alt="Ảnh mặc định">
+          <% } %>
+              <div class="card-body">
+                <h5 class="card-title">
+                  <a href="/projects/<%= project.id %>" class="text-decoration-none"><%= project.name %></a>
+                </h5>
+                <p class="card-text"><strong>Khóa học:</strong> <%= project.course %></p>
+                <p class="card-text"><strong>Năm học:</strong> <%= project.year %></p>
+              </div>
+            </div>
+          </div>
+        <% }) %>
       </div>
 
-      <!-- Phân trang -->
       <div class="d-flex justify-content-center mt-4">
         <nav>
           <ul class="pagination">
             <% if (page > 1) { %>
               <li class="page-item">
-                <a class="page-link" href="/projects?page=<%= page - 1 %>&limit=2&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Trước</a>
+                <a class="page-link" href="/projects?page=<%= page - 1 %>&limit=5&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Trước</a>
               </li>
             <% } %>
-
+    
             <% let pages = [];
               if (totalPages <= 5) {
                 pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -86,26 +85,27 @@
                 pages = [page - 2, page - 1, page, page + 1, page + 2];
               }
             %>
-
+    
             <% pages.forEach(p => { %>
               <li class="page-item <%= p === page ? 'active' : '' %>">
-                <a class="page-link" href="/projects?page=<%= p %>&limit=2&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">
+                <a class="page-link" href="/projects?page=<%= p %>&limit=5&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">
                   <%= p %>
                 </a>
               </li>
             <% }) %>
-
+    
             <% if (page < totalPages) { %>
               <li class="page-item">
-                <a class="page-link" href="/projects?page=<%= page + 1 %>&limit=2&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Sau</a>
+                <a class="page-link" href="/projects?page=<%= page + 1 %>&limit=5&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Sau</a>
               </li>
             <% } %>
           </ul>
         </nav>
       </div>
     <% } else { %>
-      <p class="text-danger text-center mt-3">Không có kết quả phù hợp</p>
+      <p class="text-danger text-center mt-3">Emty</p>
     <% } %>
+    
   </main>
 
   <footer><%- include('../partials/footer'); %></footer>
@@ -119,7 +119,7 @@
       params.set("search", searchInput.value);
       params.set("sortBy", sortBySelect.value);
       params.set("order", orderSelect.value);
-      params.set("page", 1); // reset về trang đầu tiên khi lọc
+      params.set("page", 1); 
 
       window.location.href = "/projects?" + params.toString();
     }
