@@ -9,47 +9,50 @@
   <header><%- include('../partials/header'); %></header>
   <main class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1>Danh sách dự án</h1>
-      <a href="/projects/addProjectPage" class="btn btn-success d-flex justify-content-center align-items-center">
-        <svg width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
-        Thêm Dự Án</a>
+      <% if (user) { %>
+        <a href="/projects/addProjectPage" class="btn btn-success d-flex justify-content-center align-items-center">
+          <svg width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+          </svg>
+          Add Project
+        </a>
+      <% } %>
     </div>
 
-    <!-- Phần lọc dữ liệu -->
+  
     <div class="card p-3 mb-4 shadow-sm">
       <div class="row g-2">
         <div class="col-md-4">
-          <label for="search" class="form-label">Tìm kiếm</label>
-          <input type="text" id="search" class="form-control" value="<%= search %>">
+          <label for="search" class="form-label">Search</label>
+          <input type="text" id="search" placeholder="Name or Corse" class="form-control" value="<%= search %>">
         </div>
         <div class="col-md-4">
-          <label for="sortBy" class="form-label">Sắp xếp theo</label>
+          <label for="sortBy" class="form-label">Order by</label>
           <select id="sortBy" class="form-select">
             <option value="id" <%= sortBy==="id" ? "selected" : "" %>>ID</option>
-            <option value="name" <%= sortBy==="name" ? "selected" : "" %>>Tên</option>
-            <option value="course" <%= sortBy==="course" ? "selected" : "" %>>Khóa học</option>
-            <option value="year" <%= sortBy==="year" ? "selected" : "" %>>Năm học</option>
+            <option value="name" <%= sortBy==="name" ? "selected" : "" %>>Name</option>
+            <option value="course" <%= sortBy==="course" ? "selected" : "" %>>Course/option>
+            <option value="year" <%= sortBy==="year" ? "selected" : "" %>>Year</option>
           </select>
         </div>
         <div class="col-md-4">
-          <label for="order" class="form-label">Thứ tự</label>
+          <label for="order" class="form-label">Order</label>
           <select id="order" class="form-select">
-            <option value="asc" <%= order==="asc" ? "selected" : "" %>>Tăng dần</option>
-            <option value="desc" <%= order==="desc" ? "selected" : "" %>>Giảm dần</option>
+            <option value="asc" <%= order==="asc" ? "selected" : "" %>>ASC</option>
+            <option value="desc" <%= order==="desc" ? "selected" : "" %>>DESC</option>
           </select>
         </div>
       </div>
     </div>
 
-    <!-- Hiển thị dữ liệu -->
+    
     <% if (projects.length > 0) { %>
       <div class="row">
         <% projects.forEach(project => { %>
-          <div class="col-md-4 mb-4">
-            <div class="card shadow-sm">
-               <!-- Ảnh đại diện -->
+       <div class="col-md-4 mb-4">
+       <div class="card shadow-sm">
           <% if (project.images && project.images.length > 0) { %>
-            <img src="/uploads/<%= project.images[0] %>" class="card-img-top img-fluid project-img" alt="Ảnh dự án" style="height: 200px; object-fit: cover;">
+            <img src="/uploads/<%= project.images[0] %>" class="card-img-top img-fluid project-img" alt="Image" style="height: 200px; object-fit: cover;">
           <% } else { %>
             <img src="https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/hinh-anh-thien-nhien-dep-3d-001.jpg" class="card-img-top img-fluid project-img" style="height: 200px; object-fit: cover;" alt="Ảnh mặc định">
           <% } %>
@@ -57,8 +60,8 @@
                 <h5 class="card-title">
                   <a href="/projects/<%= project.id %>" class="text-decoration-none"><%= project.name %></a>
                 </h5>
-                <p class="card-text"><strong>Khóa học:</strong> <%= project.course %></p>
-                <p class="card-text"><strong>Năm học:</strong> <%= project.year %></p>
+                <p class="card-text"><strong>Course:</strong> <%= project.course %></p>
+                <p class="card-text"><strong>Year:</strong> <%= project.year %></p>
               </div>
             </div>
           </div>
@@ -70,7 +73,7 @@
           <ul class="pagination">
             <% if (page > 1) { %>
               <li class="page-item">
-                <a class="page-link" href="/projects?page=<%= page - 1 %>&limit=5&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Trước</a>
+                <a class="page-link" href="/projects?page=<%= page - 1 %>&limit=6&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Previous</a>
               </li>
             <% } %>
     
@@ -88,7 +91,7 @@
     
             <% pages.forEach(p => { %>
               <li class="page-item <%= p === page ? 'active' : '' %>">
-                <a class="page-link" href="/projects?page=<%= p %>&limit=5&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">
+                <a class="page-link" href="/projects?page=<%= p %>&limit=6&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">
                   <%= p %>
                 </a>
               </li>
@@ -96,7 +99,7 @@
     
             <% if (page < totalPages) { %>
               <li class="page-item">
-                <a class="page-link" href="/projects?page=<%= page + 1 %>&limit=5&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Sau</a>
+                <a class="page-link" href="/projects?page=<%= page + 1 %>&limit=6&search=<%= search %>&sortBy=<%= sortBy %>&order=<%= order %>">Next</a>
               </li>
             <% } %>
           </ul>

@@ -10,18 +10,18 @@
         <div class="card shadow-lg">
             <div class="card-body">
                 <h1 class="text-primary"><%= projectInfo.name %></h1>
-                <p><strong>Kỳ học:</strong> <%= projectInfo.semester %> (<%= projectInfo.year %>)</p>
-                <p><strong>Môn học:</strong> <%= projectInfo.course %></p>
-                <p><strong>Người tạo:</strong> <%= projectInfo.creator.name %></p>
+                <p><strong>Semester:</strong> <%= projectInfo.semester %> (<%= projectInfo.year %>)</p>
+                <p><strong>Course:</strong> <%= projectInfo.course %></p>
+                <p><strong>Created by:</strong> <%= projectInfo.creator.name %></p>
             
-                <h2 class="mt-4">Sinh viên tham gia:</h2>
+                <h2 class="mt-4">Students:</h2>
                 <ul class="list-group mb-4">
                     <% projectInfo.students.forEach(student => { %>
                         <li class="list-group-item"><%= student.student_id %> - <%= student.student_name %></li>
                     <% }) %>
                 </ul>
             
-                <h2 class="mt-4">Hình ảnh dự án:</h2>
+                <h2 class="mt-4">Images:</h2>
                 <% if (projectInfo.images.length > 0) { %>
                     <div class="row">
                         <% projectInfo.images.forEach((img, index) => { %>
@@ -43,11 +43,11 @@
                         <% }) %>
                     </div>
                 <% } else { %>
-                    <p class="text-muted">Không có ảnh nào.</p>
+                    <p class="text-muted">No images available.</p>
                 <% } %>
             
                 <br>
-                <a href="/projects" class="btn btn-secondary">Quay lại</a>
+                <a href="/projects" class="btn btn-secondary">Back</a>
             </div>
         </div>
     </main>

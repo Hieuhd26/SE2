@@ -39,22 +39,13 @@ CREATE TABLE project_images (
 
 
 INSERT INTO users (name, password, role,status) VALUES
-('Quân', 'wBYnEHEm9fXZERUZ3r+f4g==', 'admin','true'),
-('Hiệu', 'ObGdRzsnqA4xq1ZKRKDdPw==', 'teacher','true');
+('Quân', '$2a$10$pwNwClnms3dNq4ilzI2u9uP/BqfS05fTo4QTnT/GrYKq7L5b/gHDm', 'admin','true'),
+('Hiệu', '$2a$10$pwNwClnms3dNq4ilzI2u9uP/BqfS05fTo4QTnT/GrYKq7L5b/gHDm', 'teacher','true');
 
 INSERT INTO projects (name, semester, year, course, created_by) VALUES
 ('Car Project 1', 'Spring', '2025', 'SE2', 2),
 ('Car Project 2', 'Spring', '2024', 'SE2', 2),
-('Car Project 3', 'Spring', '2025', 'SQA', 2),
-('Car Project 4', 'Spring', '2024', 'SQA', 2),
-('Car Project 5', 'Spring', '2025', 'SE2', 2),
-('Car Project 6', 'Spring', '2024', 'SE2', 2),
-('Car Project 7', 'Spring', '2024', 'SQA', 2),
-('Car Project 8', 'Spring', '2025', 'SQA', 2),
-('Car Project 9', 'Spring', '2024', 'SQA', 2),
-('Car Project 10', 'Spring', '2024', 'SE2', 2),
-('Car Project 11', 'Spring', '2024', 'SQA', 2),
-('Car Project 12', 'Spring', '2025', 'SE2', 2),
+
 
 ('Web Development Project', 'Fall', '2024', 'SQA', 2);
 

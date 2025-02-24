@@ -22,7 +22,7 @@ router.get(
   "", async function (req, res, next) {
     try {
       let page = parseInt(req.query.page) || 1;
-      let limit = parseInt(req.query.limit) || 5;
+      let limit = parseInt(req.query.limit) || 6;
       let offset = (page - 1) * limit;
       let validColumns = ["id", "name", "course", "year"];
       let sortBy = validColumns.includes(req.query.sortBy)
@@ -67,64 +67,11 @@ router.get(
         search: req.query.search || "",
       });
     } catch (err) {
-      next(new AppError("Yêu cầu không hợp lệ!", 400));
+      next(new AppError("Invalid request!", 400));
     }
   }
 );
-
-router.use(authMiddleware);
-router.get("/addProjectPage", function (req, res) {
-  res.render("./pages/addProjectPage");
-});
-
-router.post("/addProject", upload.array("files"), async function (req, res,next) {
-  const { name, semester, year, course } = req.body;
-  const studentsList = JSON.parse(req.body.students);
-  const files = req.files;
-
-  try {
-    await connection.beginTransaction();
-    const userId = req.cookies.userId;
-    if (!userId) {
-      return res.status(401).send("You have to login");
-    }
-
-    const [projectResult] = await connection.execute(
-      "INSERT INTO projects (name, semester, year, course, created_by) VALUES (?, ?, ?, ?, ?)",
-      [name, semester, year, course, userId]
-    );
-    const projectId = projectResult.insertId;
-
-    for (const student of studentsList) {
-      await connection.execute(
-        "INSERT INTO students (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)",
-        [student.id, student.name]
-      );
-
-      await connection.execute(
-        "INSERT INTO project_students (project_id, student_id) VALUES (?, ?)",
-        [projectId, student.id]
-      );
-    }
-
-    for (const file of files) {
-      const imageUrl = file.filename;
-      await connection.execute(
-        "INSERT INTO project_images (project_id, image_url) VALUES (?, ?)",
-        [projectId, imageUrl]
-      );
-    }
-
-    await connection.commit();
-    res.status(201).json({ message: "Project added successfully!" });
-  } catch (error) {
-    await connection.rollback();
-    res.status(500).json({ message: "Error adding project", error });
-    next(new AppError("Error in adding projects", 500));
-  }
-});
-
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res,next) => {
   try {
     const sql_user = `SELECT 
     p.id AS project_id, 
@@ -178,5 +125,59 @@ router.get("/:id", async (req, res) => {
     next(new AppError("Error in getting detail projects", 500));
   }
 });
+
+
+router.use(authMiddleware);
+router.get("/addProjectPage", function (req, res) {
+  res.render("./pages/addProjectPage");
+});
+
+router.post("/addProject", upload.array("files"), async function (req, res,next) {
+  const { name, semester, year, course } = req.body;
+  const studentsList = JSON.parse(req.body.students);
+  const files = req.files;
+
+  try {
+    await connection.beginTransaction();
+    const userId = req.cookies.userId;
+    if (!userId) {
+      return res.status(401).send("You have to login");
+    }
+
+    const [projectResult] = await connection.execute(
+      "INSERT INTO projects (name, semester, year, course, created_by) VALUES (?, ?, ?, ?, ?)",
+      [name, semester, year, course, userId]
+    );
+    const projectId = projectResult.insertId;
+
+    for (const student of studentsList) {
+      await connection.execute(
+        "INSERT INTO students (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)",
+        [student.id, student.name]
+      );
+
+      await connection.execute(
+        "INSERT INTO project_students (project_id, student_id) VALUES (?, ?)",
+        [projectId, student.id]
+      );
+    }
+
+    for (const file of files) {
+      const imageUrl = file.filename;
+      await connection.execute(
+        "INSERT INTO project_images (project_id, image_url) VALUES (?, ?)",
+        [projectId, imageUrl]
+      );
+    }
+
+    await connection.commit();
+     res.status(201).json({ message: "Project added successfully!" });
+  } catch (error) {
+    await connection.rollback();
+     res.status(500).json({ message: "Error adding project", error });
+    next(new AppError("Error in adding projects", 500));
+  }
+});
+
 
 module.exports = router;

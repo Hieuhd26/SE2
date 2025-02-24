@@ -60,24 +60,16 @@ router.put("/edit/:id", async function (req, res) {
 
 router.patch("/toggle-status/:id", async function (req, res) {
     const userId = req.params.id;
-
     try {
-        // Lấy trạng thái hiện tại của user
         let [rows] = await connection.query("SELECT status FROM users WHERE id = ?", [userId]);
-
         if (rows.length === 0) {
             return res.status(404).json({ message: "User not found" });
         }
-
-        // Đảo trạng thái (toggle)
         let newStatus = rows[0].status === "true" ? "false" : "true";
-
-        // Cập nhật trạng thái mới vào database
         await connection.query("UPDATE users SET status = ? WHERE id = ?", [newStatus, userId]);
-
         res.status(200).json({ message: "User status updated", status: newStatus });
     } catch (error) {
-        console.error(error);
+    
         res.status(500).json({ message: "Error!" });
     }
 });
